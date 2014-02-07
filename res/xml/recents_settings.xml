@@ -51,6 +51,11 @@
             android:key="show_labels"
             android:summary="@string/show_app_labels_summary"
             android:title="@string/show_app_labels" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="auto_close"
+            android:summary="@string/auto_close_summary"
+            android:title="@string/auto_close" />
         <Preference
             android:key="button_config"
             android:summary="@string/buttons_summary"

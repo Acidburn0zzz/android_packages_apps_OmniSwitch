@@ -76,6 +76,7 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_AUTO_HIDE_HANDLE = "auto_hide_handle";
     public static final String PREF_DRAG_HANDLE_ENABLE = "drag_handle_enable";
     public static final String PREF_ENABLE = "enable";
+    public static final String PREF_AUTO_CLOSE = "auto_close";
     
     public static int BUTTON_KILL_ALL = 0;
     public static int BUTTON_KILL_OTHER = 1;

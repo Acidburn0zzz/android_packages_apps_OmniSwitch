@@ -46,6 +46,7 @@ public class SwitchConfiguration {
     public int mHorizontalMargin;
     public static final int AUTO_HIDE_DEFAULT = 3000; // 3s
     public boolean mDragHandleShow = true;
+    public boolean mAutoClose = true;
 
     public static SwitchConfiguration mInstance;
     private WindowManager mWindowManager;
@@ -100,6 +101,7 @@ public class SwitchConfiguration {
         mDragHandleOpacity = (float) opacity / 100.0f;
         mAutoHide= prefs.getBoolean(SettingsActivity.PREF_AUTO_HIDE_HANDLE, false);
         mDragHandleShow = prefs.getBoolean(SettingsActivity.PREF_DRAG_HANDLE_ENABLE, true);
+        mAutoClose = prefs.getBoolean(SettingsActivity.PREF_AUTO_CLOSE, true);
     }
     
     // includes rotation                

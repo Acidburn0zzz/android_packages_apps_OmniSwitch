@@ -160,14 +160,16 @@ public class SwitchManager {
         mLayout.update(mLoadedTasks, true);
     }
 
-    public void killAll() {
+    public void killAll(boolean close) {
         final ActivityManager am = (ActivityManager) mContext
                 .getSystemService(Context.ACTIVITY_SERVICE);
 
         if (mLoadedTasks.size() == 0) {
-            Intent hideRecent = new Intent(
-                    SwitchService.RecentsReceiver.ACTION_HIDE_OVERLAY);
-            mContext.sendBroadcast(hideRecent);
+            if (close){
+                Intent hideRecent = new Intent(
+                        SwitchService.RecentsReceiver.ACTION_HIDE_OVERLAY);
+                mContext.sendBroadcast(hideRecent);
+            }
             return;
         }
 
@@ -181,17 +183,23 @@ public class SwitchManager {
             }
             ad.setKilled();
         }
-        dismissAndGoHome();
+        if (close){
+            dismissAndGoHome();
+        } else {
+            reload();
+        }
     }
 
-    public void killOther() {
+    public void killOther(boolean close) {
         final ActivityManager am = (ActivityManager) mContext
                 .getSystemService(Context.ACTIVITY_SERVICE);
 
         if (mLoadedTasks.size() == 0) {
-            Intent hideRecent = new Intent(
-                    SwitchService.RecentsReceiver.ACTION_HIDE_OVERLAY);
-            mContext.sendBroadcast(hideRecent);
+            if (close){
+                Intent hideRecent = new Intent(
+                        SwitchService.RecentsReceiver.ACTION_HIDE_OVERLAY);
+                mContext.sendBroadcast(hideRecent);
+            }
             return;
         }
         Iterator<TaskDescription> nextTask = mLoadedTasks.iterator();
@@ -206,9 +214,13 @@ public class SwitchManager {
             }
             ad.setKilled();
         }
-        Intent hideRecent = new Intent(
-                SwitchService.RecentsReceiver.ACTION_HIDE_OVERLAY);
-        mContext.sendBroadcast(hideRecent);
+        if (close){
+            Intent hideRecent = new Intent(
+                    SwitchService.RecentsReceiver.ACTION_HIDE_OVERLAY);
+            mContext.sendBroadcast(hideRecent);
+        } else {
+            reload();
+        }
     }
 
     public void dismissAndGoHome() {

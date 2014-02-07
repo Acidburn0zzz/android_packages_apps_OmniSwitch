@@ -439,7 +439,7 @@ public class SwitchLayout implements OnShowcaseEventListener {
             }});
         mKillAllButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mRecentsManager.killAll();
+                mRecentsManager.killAll(mConfiguration.mAutoClose);
             }
         });
 
@@ -471,7 +471,7 @@ public class SwitchLayout implements OnShowcaseEventListener {
 
         mKillOtherButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mRecentsManager.killOther();
+                mRecentsManager.killOther(mConfiguration.mAutoClose);
             }
         });
         mKillOtherButton.setOnLongClickListener(new View.OnLongClickListener() {
