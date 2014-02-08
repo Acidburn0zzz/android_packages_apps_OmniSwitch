@@ -17,13 +17,11 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.omnirom.omniswitch.MemInfoReader;
 import org.omnirom.omniswitch.R;
 import org.omnirom.omniswitch.SettingsActivity;
 import org.omnirom.omniswitch.SwitchConfiguration;
@@ -35,6 +33,7 @@ import org.omnirom.omniswitch.showcase.ShowcaseView;
 import org.omnirom.omniswitch.showcase.ShowcaseView.OnShowcaseEventListener;
 
 import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
@@ -99,9 +98,6 @@ public class SwitchLayout implements OnShowcaseEventListener {
     private TextView mBackgroundProcessText;
     private TextView mForegroundProcessText;
     private Handler mHandler = new Handler();
-    private ActivityManager.MemoryInfo mMemInfo = new ActivityManager.MemoryInfo();
-    private MemInfoReader mMemInfoReader = new MemInfoReader();
-    private long mSecServerMem;
     private List<String> mFavoriteList;
     private List<Drawable> mFavoriteIcons;
     private List<String> mFavoriteNames;
@@ -195,7 +191,6 @@ public class SwitchLayout implements OnShowcaseEventListener {
         mRecentsManager = manager;
     }
 
-    @SuppressWarnings("rawtypes")
     public SwitchLayout(Context context) {
         mContext = context;
         mWindowManager = (WindowManager) mContext
@@ -212,28 +207,6 @@ public class SwitchLayout implements OnShowcaseEventListener {
         mFavoriteListAdapter = new FavoriteListAdapter(mContext,
                 android.R.layout.simple_list_item_multiple_choice,
                 mFavoriteList);
-
-        final ActivityManager am = (ActivityManager) mContext
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        am.getMemoryInfo(mMemInfo);
-        String sClassName = "android.app.ActivityManager";
-        try {
-            Class classToInvestigate = Class.forName(sClassName);
-            Class[] classes = classToInvestigate.getDeclaredClasses();
-            for (int i = 0; i < classes.length; i++) {
-                Class c = classes[i];
-                if (c.getName()
-                        .equals("android.app.ActivityManager$MemoryInfo")) {
-                    String strNewFieldName = "secondaryServerThreshold";
-                    Field field = c.getField(strNewFieldName);
-                    mSecServerMem = field.getLong(mMemInfo);
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException e) {
-        } catch (NoSuchFieldException e) {
-        } catch (Exception e) {
-        }
     }
 
     private synchronized void createView() {
@@ -868,7 +841,9 @@ public class SwitchLayout implements OnShowcaseEventListener {
         mRecentListAdapter.notifyDataSetChanged();
 
         if(show){
-            mHandler.post(updateRamBarTask);
+            if (mRamUsageBar != null && mConfiguration.mShowRambar) {
+                mHandler.post(updateRamBarTask);
+            }
             mTaskLoadDone = true;
             updateNoRecentsApps();
         }
@@ -937,11 +912,14 @@ public class SwitchLayout implements OnShowcaseEventListener {
             if (!mConfiguration.mShowRambar || mRamUsageBar == null) {
                 return;
             }
-            mMemInfoReader.readMemInfo();
-            long availMem = mMemInfoReader.getFreeSize()
-                    + mMemInfoReader.getCachedSize() - mSecServerMem;
-            long totalMem = mMemInfoReader.getTotalSize();
+            final ActivityManager am = (ActivityManager) mContext
+                    .getSystemService(Context.ACTIVITY_SERVICE);
+            MemoryInfo memInfo = new MemoryInfo();
+            am.getMemoryInfo(memInfo);
 
+            long availMem = memInfo.availMem;
+            long totalMem = memInfo.totalMem;
+            
             String sizeStr = Formatter.formatShortFileSize(mContext, totalMem
                     - availMem);
             mForegroundProcessText.setText(mContext.getResources().getString(
